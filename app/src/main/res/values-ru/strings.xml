@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Места</string>
+    <string name="new_marker_dialog_title">Новый маркер</string>
+    <string name="title_activity_maps">Карта</string>
+    <string name="new_marker_dialog_message">Хотели бы вы поставить новый маркер?</string>
+    <string name="marker_photo_title">Назначить фото?</string>
+    <string name="marker_photo_message">Хотели бы вы назначить фото для этого маркера?</string>
+    <string name="remove_marker">Я вообще хочу удалить маркер</string>
+</resources>

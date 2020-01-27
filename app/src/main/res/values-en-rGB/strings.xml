@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Places</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="new_marker_dialog_title">A new marker</string>
     <string name="new_marker_dialog_message">Would you like to set up a new marker?</string>
+    <string name="new_marker_dialog_title">A new marker</string>
+    <string name="title_activity_maps">Map</string>
     <string name="marker_photo_title">Set photo?</string>
     <string name="marker_photo_message">Would you like to set a photo for that marker?</string>
     <string name="remove_marker">I wanna remove marker</string>
