@@ -7,4 +7,7 @@
     <string name="marker_photo_title">Назначить фото?</string>
     <string name="marker_photo_message">Хотели бы вы назначить фото для этого маркера?</string>
     <string name="remove_marker">Я вообще хочу удалить маркер</string>
+    <string name="title_activity_photo">Фото маркера</string>
+    <string name="cancel_photo">Отменить изменения</string>
+    <string name="save_photo">Сохранить изменения</string>
 </resources>
