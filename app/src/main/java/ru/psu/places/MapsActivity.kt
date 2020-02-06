@@ -1,6 +1,8 @@
 package ru.psu.places
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +27,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         else
             hashMapOf()
         val extra = intent.extras
-        if (extra != null && extra.getBoolean("changed"))
+        if (extra != null)
             photos[extra.getParcelable("position")!!] = extra.getString("photoUri")
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -33,8 +35,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
         outState.putSerializable("markers", photos)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -42,6 +44,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setOnMapClickListener {coordinates -> onMapClick(coordinates)}
         map.setOnMarkerClickListener {marker -> onMarkerClick(marker)}
         photos.keys.forEach { position -> map.addMarker(MarkerOptions().position(position)) }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK){
+            val modifiedPosition: LatLng = data?.extras?.getParcelable<LatLng>("position") as LatLng
+            photos[modifiedPosition] = data.extras?.getString("photoUri")
+        }
     }
 
     private fun addMarker(coordinates: LatLng){
@@ -64,10 +74,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun callPhotoActivity(marker: Marker?) {
-        startActivity(
+        startActivityForResult(
             Intent(this, PhotoActivity::class.java)
                 .putExtra("position", marker?.position)
-                .putExtra("photoUri", photos[marker?.position])
+                .putExtra("photoUri", photos[marker?.position]), 1
         )
     }
 
