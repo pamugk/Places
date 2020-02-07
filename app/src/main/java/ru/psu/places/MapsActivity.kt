@@ -2,7 +2,6 @@ package ru.psu.places
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -49,8 +48,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == Activity.RESULT_OK){
-            val modifiedPosition: LatLng = data?.extras?.getParcelable<LatLng>("position") as LatLng
-            photos[modifiedPosition] = data.extras?.getString("photoUri")
+            val modifiedPosition: LatLng? = data?.extras?.getParcelable<LatLng>("position")
+            if (modifiedPosition != null)
+                photos[modifiedPosition] = data.extras?.getString("photoUri")
         }
     }
 
