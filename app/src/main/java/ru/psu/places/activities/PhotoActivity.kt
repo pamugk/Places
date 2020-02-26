@@ -1,4 +1,4 @@
-package ru.psu.places
+package ru.psu.places.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.activity_photo.*
+import ru.psu.places.R
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
