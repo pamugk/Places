@@ -10,4 +10,11 @@
     <string name="new_photo">Make new photo</string>
     <string name="save_photo">Save changes</string>
     <string name="cancel_photo">Cancel changes</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_required_toast">Permission required</string>
+    <string name="location_permission_denied">Location permission denied</string>
+    <string name="permission_rationale_location">This app wants to know your location</string>
+    <string name="placeNotificationTitle">Place notification</string>
+    <string name="placeNotificationText">Some marked place is nigh</string>
 </resources>

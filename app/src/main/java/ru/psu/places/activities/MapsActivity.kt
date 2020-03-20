@@ -1,10 +1,18 @@
 package ru.psu.places.activities
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -16,24 +24,120 @@ import io.realm.kotlin.createObject
 import io.realm.kotlin.where
 import ru.psu.places.R
 import ru.psu.places.model.MarkedMarker
+import ru.psu.places.utils.PermissionUtils
 import ru.psu.places.utils.RealmUtility
+import kotlin.math.*
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private val KILOMETERS_PER_DEGREE = 111.1
 
     private lateinit var map: GoogleMap
     private lateinit var realm: Realm
+    private lateinit var locationCallback: LocationCallback
+
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationClient: FusedLocationProviderClient
+
+    fun calculateDistance(marker:MarkedMarker, location:Location):Double {
+        val dl = marker.longitude - location.longitude
+        val cosF1 = cos(marker.latitude)
+        val sinF1 = sin(marker.latitude)
+        val cosF2 = cos(location.latitude)
+        val sinF2 = sin(location.latitude)
+        val tmp1 = cosF2 * sin(dl)
+        val tmp2 = cosF1 * sinF2 - sinF1 * cosF2 * cos(dl)
+
+        return KILOMETERS_PER_DEGREE * atan(
+            sqrt(tmp1 * tmp1 + tmp2 * tmp2) /
+                    (sinF1 * sinF2 + cosF1 * cosF2 * cos(dl))
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         realm = Realm.getInstance(RealmUtility().getDefaultConfig()!!)
+        locationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 20 * 1000
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                for (location in locationResult.locations)
+                    if (realm.where<MarkedMarker>().findAll().any {
+                            marker -> calculateDistance(marker, location) <= 1.0
+                    })
+                        with(NotificationManagerCompat.from(baseContext)) {
+                            notify(123,  NotificationCompat.Builder(baseContext, "12345")
+                                .setContentTitle(getString(R.string.placeNotificationTitle))
+                                .setContentText(getString(R.string.placeNotificationText))
+                                .setStyle(NotificationCompat.BigTextStyle()
+                                    .bigText(getString(R.string.placeNotificationText)))
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                .build())
+                        }
+                println("Some point is nigh")
+            }
+        }
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        startLocationUpdates()
+    }
+
+    private fun startLocationUpdates() {
+        locationClient.requestLocationUpdates(locationRequest,
+            locationCallback,
+            Looper.getMainLooper())
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    private fun stopLocationUpdates() {
+        locationClient.removeLocationUpdates(locationCallback)
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            return
+        }
+        if (PermissionUtils.isPermissionGranted(
+                permissions,
+                grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
+            map.isMyLocationEnabled = true
+        else
+            println("Location permissions are denied")
+    }
+
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED)
+            map.setMyLocationEnabled(true)
+        else
+            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
+                Manifest.permission.ACCESS_FINE_LOCATION, true)
         map.setOnMapClickListener {coordinates -> onMapClick(coordinates)}
         map.setOnMarkerClickListener {marker -> onMarkerClick(marker)}
         realm.where<MarkedMarker>().findAll().forEach { marker -> map.addMarker(

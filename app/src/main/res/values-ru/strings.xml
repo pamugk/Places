@@ -10,4 +10,12 @@
     <string name="title_activity_photo">Фото маркера</string>
     <string name="cancel_photo">Отменить изменения</string>
     <string name="save_photo">Сохранить изменения</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="permission_required_toast">Необходимо разрешение</string>
+    <string name="location_permission_denied">Отказано в разрешении к местоположению</string>
+    <string name="permission_rationale_location">Этому приложению интересно ваше местоположение</string>
+    <string name="new_photo">Новое фото</string>
+    <string name="placeNotificationTitle">Оповещение о месте</string>
+    <string name="placeNotificationText">Близится одно из отмеченных мест</string>
 </resources>
