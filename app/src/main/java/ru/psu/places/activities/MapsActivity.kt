@@ -68,10 +68,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 locationResult ?: return
                 for (location in locationResult.locations)
                     if (realm.where<MarkedMarker>().findAll().any {
-                            marker -> calculateDistance(marker, location) <= 1.0
-                    })
+                                marker -> calculateDistance(marker, location) <= 1.0
+                        })
                         with(NotificationManagerCompat.from(baseContext)) {
                             notify(123,  NotificationCompat.Builder(baseContext, "12345")
+                                .setSmallIcon(R.mipmap.ic_launcher)
                                 .setContentTitle(getString(R.string.placeNotificationTitle))
                                 .setContentText(getString(R.string.placeNotificationText))
                                 .setStyle(NotificationCompat.BigTextStyle()
@@ -79,7 +80,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                 .build())
                         }
-                println("Some point is nigh")
             }
         }
 
